@@ -37,7 +37,7 @@ fn main() {
 
     for entry in dirs {
         pool.execute(move || {
-            println!("Deleting dir {}", &entry.as_path().display())
+            println!("Deleting dir {}", &entry.as_path().display());
             fs::remove_dir_all(entry).expect("Failed to remove dir");
         });
     }
