@@ -25,7 +25,11 @@ fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
 fn main() {
     let current_dir = env::current_dir().unwrap();
 
-    let mut files: Vec<PathBuf> = Vec::new();
+    let mut dirs: Vec<PathBuf> = Vec::new();
 
-    scan_dir(&current_dir, &mut files);
+    scan_dir(&current_dir, &mut dirs);
+
+    for entry in dirs {
+        fs::remove_dir_all(entry).expect("Failed to remove dir");
+    }
 }
