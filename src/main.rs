@@ -23,6 +23,12 @@ fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
 }
 
 fn main() {
+    let cpus = num_cpus::get();
+    let mut thread_pool_size = (cpus / 2).floor();
+    if thread_pool_size < 1 {
+        thread_pool_size = 1;
+    }
+
     let current_dir = env::current_dir().unwrap();
 
     let mut dirs: Vec<PathBuf> = Vec::new();
