@@ -27,7 +27,9 @@ fn main() {
     let cpus = num_cpus::get();
     let thread_pool_size = cpus / 2;
 
-    let pool = threadpool_Builder::new().num_threads(thread_pool_size);
+    let pool = threadpool_Builder::new()
+        .num_threads(thread_pool_size)
+        .build();
 
     let current_dir = env::current_dir().unwrap();
 
