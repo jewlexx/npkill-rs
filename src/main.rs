@@ -24,6 +24,12 @@ fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
 }
 
 fn main() {
+    let current_dir = env::current_dir().unwrap();
+
+    let mut dirs: Vec<PathBuf> = Vec::new();
+
+    scan_dir(&current_dir, &mut dirs);
+
     let cpus = num_cpus::get();
     let thread_pool_size = cpus / 2;
 
@@ -31,13 +37,9 @@ fn main() {
         .num_threads(thread_pool_size)
         .build();
 
-    let current_dir = env::current_dir().unwrap();
-
-    let mut dirs: Vec<PathBuf> = Vec::new();
-
-    scan_dir(&current_dir, &mut dirs);
-
     for entry in dirs {
-        fs::remove_dir_all(entry).expect("Failed to remove dir");
+        pool.execute(move || {
+            fs::remove_dir_all(entry).expect("Failed to remove dir");
+        });
     }
 }
