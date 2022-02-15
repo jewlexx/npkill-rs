@@ -2,8 +2,6 @@ use std::{env, fs, path::PathBuf};
 use threadpool::Builder as threadpool_Builder;
 
 fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
-    println!("Reading files in {}", &current_dir.display());
-
     let mut args = env::args();
     let dir_name = args.nth(1).unwrap_or("node_modules".to_string());
 
@@ -39,7 +37,10 @@ fn main() {
 
     for entry in dirs {
         pool.execute(move || {
+            println!("Deleting dir {}", &entry.as_path().display())
             fs::remove_dir_all(entry).expect("Failed to remove dir");
         });
     }
+
+    pool.join();
 }
