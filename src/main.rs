@@ -1,4 +1,5 @@
 use std::{env, fs, path::PathBuf};
+use threadpool::Builder as threadpool_Builder;
 
 fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
     println!("Reading files in {}", &current_dir.display());
@@ -24,10 +25,9 @@ fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
 
 fn main() {
     let cpus = num_cpus::get();
-    let mut thread_pool_size = ((cpus / 2) as f32).floor() as i32;
-    if thread_pool_size < 1 {
-        thread_pool_size = 1;
-    }
+    let thread_pool_size = cpus / 2;
+
+    let pool = threadpool_Builder::new().num_threads(thread_pool_size);
 
     let current_dir = env::current_dir().unwrap();
 
