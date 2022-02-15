@@ -1,4 +1,4 @@
-use std::{env, fs, path::PathBuf};
+use std::{collections::HashMap, env, fs, path::PathBuf};
 use threadpool::Builder as threadpool_Builder;
 
 fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
@@ -22,7 +22,31 @@ fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
 }
 
 fn main() {
-    let current_dir = env::current_dir().unwrap();
+    let mut args = HashMap::<String, String>::new();
+
+    for (i, el) in env::args().enumerate() {
+        if i == 0 {
+            continue;
+        }
+
+        if el.starts_with("--") {
+            if el.contains('=') {
+                let mut el = el.splitn(2, '=');
+                let key = el.next().unwrap();
+                let value = el.next().unwrap();
+
+                args.insert(key.to_string(), value.to_string());
+                continue;
+            }
+            args.insert(
+                el.to_string(),
+                env::args().enumerate().nth(i + 1).unwrap().1,
+            );
+        }
+    }
+
+    let mut current_dir = env::current_dir().unwrap();
+    current_dir.push(args.get("--dir").unwrap_or(&".".to_string()));
 
     let mut dirs: Vec<PathBuf> = Vec::new();
 
