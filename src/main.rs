@@ -1,3 +1,4 @@
+use spinners_rs::{Spinner, Spinners};
 use std::{collections::HashMap, env, fs, path::PathBuf, str::FromStr};
 use threadpool::Builder as threadpool_Builder;
 
@@ -53,8 +54,9 @@ fn main() {
 
     let mut dirs: Vec<PathBuf> = Vec::new();
 
-    println!("Searching Dirs...");
+    let sp = Spinner::new(&Spinners::Aesthetic, "Scanning directories...".into());
     scan_dir(&current_dir, &mut dirs);
+    sp.stop();
 
     let cpus = num_cpus::get();
     let thread_pool_size = cpus / 2;
