@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, fs, path::PathBuf};
+use std::{collections::HashMap, env, fs, path::PathBuf, str::FromStr};
 use threadpool::Builder as threadpool_Builder;
 
 fn scan_dir(current_dir: &PathBuf, files: &mut Vec<PathBuf>) {
@@ -45,11 +45,15 @@ fn main() {
         }
     }
 
-    let mut current_dir = env::current_dir().unwrap();
-    current_dir.push(args.get("--dir").unwrap_or(&".".to_string()));
+    let current_dir = PathBuf::from_str(
+        args.get("--dir")
+            .unwrap_or(&env::current_dir().unwrap().display().to_string()),
+    )
+    .unwrap();
 
     let mut dirs: Vec<PathBuf> = Vec::new();
 
+    println!("Searching Dirs...");
     scan_dir(&current_dir, &mut dirs);
 
     let cpus = num_cpus::get();
@@ -62,7 +66,7 @@ fn main() {
     for entry in dirs {
         pool.execute(move || {
             println!("Deleting dir {}", &entry.as_path().display());
-            fs::remove_dir_all(entry).expect("Failed to remove dir");
+            // fs::remove_dir_all(entry).expect("Failed to remove dir");
         });
     }
 
