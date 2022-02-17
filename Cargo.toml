@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-threadpool = "1.8.1"
 num_cpus = "1.13.1"
 spinners-rs = "1.2.1"
 clap = { version = "3.1.0", features = ["derive"] }

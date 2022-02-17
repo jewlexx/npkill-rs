@@ -3,9 +3,8 @@ use std::{
     path::PathBuf,
     str::FromStr,
     sync::{Arc, Mutex},
-    thread,
+    thread::{self, JoinHandle},
 };
-use threadpool::Builder as threadpool_Builder;
 
 mod utils;
 use utils::*;
@@ -17,13 +16,6 @@ fn main() {
 
     let shared_dirs = Arc::new(Mutex::new(Vec::<PathBuf>::new()));
 
-    let cpus = num_cpus::get();
-    let thread_pool_size = cpus / 2;
-
-    let pool = threadpool_Builder::new()
-        .num_threads(thread_pool_size)
-        .build();
-
     let sp = Spinner::new(Spinners::Aesthetic, "Scanning directories...".into());
     let cloned_dirs = Arc::clone(&shared_dirs);
     thread::spawn(move || {
@@ -31,17 +23,18 @@ fn main() {
     });
     sp.stop();
 
-    pool.join();
-
-    let pool = threadpool_Builder::new()
-        .num_threads(thread_pool_size)
-        .build();
+    let mut threads: Vec<JoinHandle<()>> = Vec::new();
 
     let new_vec: Vec<PathBuf> = shared_dirs.lock().unwrap().clone();
     for entry in new_vec {
-        pool.execute(move || {
+        let thread = thread::spawn(move || {
             println!("Deleting dir {}", &entry.as_path().display());
             // fs::remove_dir_all(entry).expect("Failed to remove dir");
         });
+        threads.push(thread);
+    }
+
+    for thread in threads {
+        thread.join().expect("Failed to join thread");
     }
 }
