@@ -3,6 +3,7 @@ use std::{
     path::PathBuf,
     str::FromStr,
     sync::{Arc, Mutex},
+    thread,
 };
 use threadpool::Builder as threadpool_Builder;
 
@@ -24,7 +25,10 @@ fn main() {
         .build();
 
     let sp = Spinner::new(Spinners::Aesthetic, "Scanning directories...".into());
-    dir::scan_dir(&current_dir, Arc::clone(&shared_dirs));
+    let cloned_dirs = Arc::clone(&shared_dirs);
+    thread::spawn(move || {
+        dir::scan_dir(&current_dir, cloned_dirs);
+    });
     sp.stop();
 
     pool.join();
