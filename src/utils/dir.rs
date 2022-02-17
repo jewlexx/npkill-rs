@@ -2,6 +2,7 @@ use std::{
     env, fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
+    thread,
 };
 
 pub fn scan_dir(current_dir: &Path, files: Arc<Mutex<Vec<PathBuf>>>) {
@@ -19,7 +20,10 @@ pub fn scan_dir(current_dir: &Path, files: Arc<Mutex<Vec<PathBuf>>>) {
             let meta = fs::metadata(&path).unwrap();
 
             if meta.is_dir() {
-                scan_dir(&entry.path(), Arc::clone(&files));
+                let cloned_files = Arc::clone(&files);
+                thread::spawn(move || {
+                    scan_dir(&path, cloned_files);
+                });
             }
         }
     }
