@@ -1,13 +1,16 @@
 use std::{
-    env, fs,
+    fs,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
     thread,
 };
 
+use super::args::parse_args;
+
 pub fn scan_dir(current_dir: &Path, files: Arc<Mutex<Vec<PathBuf>>>) {
-    let mut args = env::args();
-    let dir_name = args.nth(1).unwrap_or_else(|| "node_modules".to_string());
+    let args = parse_args();
+    let dir_name = args.search;
+
     let mut mut_files = files.lock().unwrap();
 
     for entry in fs::read_dir(current_dir).unwrap() {
