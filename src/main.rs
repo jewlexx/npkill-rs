@@ -33,7 +33,7 @@ fn main() {
         .num_threads(thread_pool_size)
         .build();
 
-    let new_vec: &'static Vec<PathBuf> = &shared_dirs.lock().unwrap().clone();
+    let new_vec: Vec<PathBuf> = shared_dirs.lock().unwrap().clone();
     for entry in new_vec {
         pool.execute(move || {
             println!("Deleting dir {}", &entry.as_path().display());

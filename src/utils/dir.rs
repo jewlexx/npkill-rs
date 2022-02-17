@@ -19,7 +19,7 @@ pub fn scan_dir(current_dir: &Path, files: Arc<Mutex<Vec<PathBuf>>>) {
             let meta = fs::metadata(&path).unwrap();
 
             if meta.is_dir() {
-                scan_dir(&entry.path(), files);
+                scan_dir(&entry.path(), Arc::clone(&files));
             }
         }
     }
